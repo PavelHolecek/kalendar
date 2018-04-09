@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./node_modules/jcanvas/dist/jcanvas.js"></script>
+</head>
+<body>
+    <h1>Nadpis</h1>
+    <div item-width="1000" item-height="600">
+        <canvas width="900" height="600" id="platno">
+                Váš prohlížeč nepodporuje tag canvas.
+        </canvas>
+    </div>
+</body>
+
+<script>
+    $(function(){
+        console.log("page is loaded");
+    });
+
+    // Syntaxe v jQuery:
+    var canvas = $('canvas').get(0);
+    
+    // Kontext
+    var context = canvas.getContext("2d");
+    var date  =  new Date();
+    
+    var day = date.getDate();
+    var month = date.getMonth();
+    var year = date.getFullYear();
+
+    // Add event listener for `click` events.
+    canvas.addEventListener('click', function(event) {
+        var x = event.pageX - canvas.offsetLeft,
+            y = event.pageY - canvas.offsetTop;
+            console.log("x: ", x, " y: ", y);
+            context.clearRect (0,0,canvas.width, canvas.height);
+            if (x > canvas.width/2) 
+                ++month;
+            else
+                --month;
+
+            drawCalendar(context, year, month);
+            if (month > 11) month = 0;
+
+    }, false);
+
+    context.beginPath();
+    var h = canvas.height/8;
+    var w = canvas.width/7;
+
+    //vertical line 7 columns
+    for(var x = 0; x <= 7; ++x) {
+            context.moveTo(x * w, 0);
+            context.lineTo(x * w, canvas.height );  
+    }
+    
+    //horizontal lines 8 rows
+    for(var y = 0; y <= 8 ;  ++y) {
+            context.moveTo(0, y * h);
+            context.lineTo(canvas.width, y * h);
+    }
+
+    var arr_days = ["Ne", "Po", "Ut", "St", "Ct", "Pa", "So"];
+    var arr_month = ["Leden", "Unor", "Brezen", "Duben", "Kveten", "Cerven", "Cervenec", "Srpen", "Zari", "Rijen", "Listopad", "Prosinec"];
+    context.font = "40px sans-serif";
+    drawCalendar(context, year, month);
+
+    function drawCalendar(context, year, month){    
+        for (var d = 0; d <=7 ; ++d)
+        {        
+            context.fillText(arr_days[d], w/3 + w*d, 3 * h/5 + h);
+        }
+
+        var days = new Date(year, month + 1, 0).getDate();
+        var d = new Date(year, month, 1, 0).getDay();
+
+        context.fillText(arr_month[month] + " " + year, 3*w, 3*h/4);
+
+        var start = d;
+        var line = 0;
+        for (var l = 1; l <= days; ++l)
+        {
+            if (start > 6)
+            {
+                start = 0;
+                ++line;
+            }
+        
+            context.fillText(l, w/2 + w * start , h/2 + h + h + h * line);        
+            ++start;
+        }
+
+        //context.fillText(date, w, h);
+        //context.fillText(day + "-" + month + "-" + year, w, 2 * h);
+        //context.fillText(days, w, 3 * h);
+        //context.fillText(text[d - 1], w, 4 * h);
+    }
+        
+    context.closePath();
+    context.stroke();
+    //context.fill();
+</script>
+
+</html>
+
